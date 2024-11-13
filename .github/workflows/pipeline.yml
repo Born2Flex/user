@@ -24,6 +24,8 @@ jobs:
 
       - name: Run Unit Tests
         run: mvn test --file user-service/pom.xml
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
