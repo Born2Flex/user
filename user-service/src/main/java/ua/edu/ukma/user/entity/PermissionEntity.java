@@ -1,47 +1,37 @@
-package ua.edu.ukma.user.entities;
+package ua.edu.ukma.user.entity;
 
 import jakarta.persistence.*;
+import java.util.Objects;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
-public class UserEntity {
+@Table(name = "permissions")
+public class PermissionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private RoleEntity role;
+    @ManyToMany(mappedBy = "permissions")
+    private Set<RoleEntity> roles;
 
     @Override
     public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserEntity that)) {
+        if (!(o instanceof PermissionEntity that)) {
             return false;
         }
 

@@ -3,10 +3,10 @@ name: Pipeline
 on:
   push:
     branches:
-      - main
-      - dev
+      - '*'
+      - '!main'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
     branches: [main]
 
 jobs:
@@ -21,6 +21,14 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
+      - name: Validate branch name
+        uses: deepakputhraya/action-branch-name@master
+        with:
+          regex: 'INT-\d+-.+'
+          ignore: main, dev
+          min_length: 5
+          max_length: 80
 
       - name: Run Unit Tests
         run: mvn test --file user-service/pom.xml

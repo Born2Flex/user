@@ -1,20 +1,20 @@
-package ua.edu.ukma.user.entities;
+package ua.edu.ukma.user.entity;
 
 import jakarta.persistence.*;
+import java.util.Objects;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "permissions")
-public class PermissionEntity {
+@Table(name = "roles")
+public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,12 +23,19 @@ public class PermissionEntity {
     @Column(name = "name")
     private String name;
 
+    @ManyToMany
+    @JoinTable(
+            name = "permission_role",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id"))
+    private Set<PermissionEntity> permissions;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PermissionEntity that)) {
+        if (!(o instanceof RoleEntity that)) {
             return false;
         }
 
