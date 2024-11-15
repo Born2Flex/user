@@ -31,7 +31,7 @@ jobs:
           max_length: 80
 
       - name: Run Unit Tests
-        run: mvn test --file user-service/pom.xml
+        run: mvn test --file pom.xml
         env:
           SPRING_PROFILES_ACTIVE: test
 
