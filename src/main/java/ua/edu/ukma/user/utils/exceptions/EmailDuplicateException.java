@@ -1,4 +1,4 @@
-package ua.edu.ukma.user.utils;
+package ua.edu.ukma.user.utils.exceptions;
 
 public class EmailDuplicateException extends RuntimeException {
     public EmailDuplicateException() {

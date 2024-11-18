@@ -1,6 +1,7 @@
 package ua.edu.ukma.user.service;
 
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.edu.ukma.user.dto.user.PasswordUpdateDto;
@@ -13,15 +14,15 @@ import ua.edu.ukma.user.enumeration.Role;
 import ua.edu.ukma.user.mapper.UserMapper;
 import ua.edu.ukma.user.repository.RoleRepository;
 import ua.edu.ukma.user.repository.UserRepository;
-import ua.edu.ukma.user.utils.EmailDuplicateException;
-import ua.edu.ukma.user.utils.NoSuchEntityException;
+import ua.edu.ukma.user.utils.exceptions.EmailDuplicateException;
+import ua.edu.ukma.user.utils.exceptions.NoSuchEntityException;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private UserMapper mapper;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private final UserMapper mapper;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public UserDto createUser(UserRegistrationDto dto) {
         validateEmail(dto.getEmail());
@@ -55,10 +56,8 @@ public class UserService {
     }
 
     public UserDto getUserByEmail(String email) {
-        return mapper.toDto(
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow(() -> new NoSuchEntityException("User not found")));
+        return mapper.toDto(userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchEntityException("User not found")));
     }
 
     public void deleteUser(Integer id) {
@@ -66,14 +65,12 @@ public class UserService {
     }
 
     private UserEntity getUserOrElseThrow(Integer id) {
-        return userRepository
-                .findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException("User not found"));
     }
 
     private RoleEntity getRoleOrElseThrow(Role role) {
-        return roleRepository
-                .findByName(role.name())
+        return roleRepository.findByName(role.name())
                 .orElseThrow(() -> new NoSuchEntityException("Role not found"));
     }
 

@@ -1,10 +1,19 @@
 package ua.edu.ukma.user.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +30,8 @@ import ua.edu.ukma.user.enumeration.Role;
 import ua.edu.ukma.user.mapper.UserMapper;
 import ua.edu.ukma.user.repository.RoleRepository;
 import ua.edu.ukma.user.repository.UserRepository;
-import ua.edu.ukma.user.utils.EmailDuplicateException;
-import ua.edu.ukma.user.utils.NoSuchEntityException;
+import ua.edu.ukma.user.utils.exceptions.EmailDuplicateException;
+import ua.edu.ukma.user.utils.exceptions.NoSuchEntityException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

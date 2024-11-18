@@ -22,3 +22,5 @@ CREATE TABLE users (
     last_name   VARCHAR(128) NOT NULL,
     role_id     INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE
 );
+
+INSERT INTO roles (name) VALUES ('CANDIDATE'), ('INTERVIEWER');

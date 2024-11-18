@@ -1,7 +1,16 @@
 package ua.edu.ukma.user.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+
 import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
