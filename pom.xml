@@ -8,7 +8,7 @@
         <version>3.3.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>ua.edu.ukma</groupId>
+    <groupId>ua.edu.internship</groupId>
     <artifactId>user</artifactId>
     <version>0.0.1</version>
     <name>user-service</name>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>annotationProcessor</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -107,7 +107,7 @@
                 <version>${jacoco-maven-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>ua/edu/ukma/user/service/**</include>
+                        <include>ua/edu/internship/user/service/business/**</include>
                     </includes>
                 </configuration>
                 <executions>
@@ -161,7 +161,31 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <banDuplicatePomDependencyVersions/>
+                                <requireReleaseDeps>
+                                    <message>SNAPSHOT dependencies not allowed!</message>
+                                </requireReleaseDeps>
+                                <requireReleaseVersion>
+                                    <message>SNAPSHOT dependencies not allowed!</message>
+                                </requireReleaseVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
 </project>

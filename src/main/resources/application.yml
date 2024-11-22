@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: user
+project:
+  version: '@project.version@'
+domain:
+  back: ${BACK_URI:http://localhost:8080}
