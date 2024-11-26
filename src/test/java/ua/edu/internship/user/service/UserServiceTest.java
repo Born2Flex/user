@@ -3,13 +3,12 @@ package ua.edu.internship.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ua.edu.internship.user.utils.TestUtils.getRegistrationDto;
+import static ua.edu.internship.user.utils.TestUtils.getUserUpdateDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,27 +42,12 @@ class UserServiceTest {
     @Mock
     private RoleRepository roleRepository;
     @InjectMocks
-    private UserService userService;
-    private UserRegistrationDto userRegistrationDto;
-    private UserUpdateDto userUpdateDto;
-    private PasswordUpdateDto passwordUpdateDto;
+    private UserService underTest;
     private UserEntity userEntity;
     private UserDto userDto;
-    private RoleEntity roleEntity;
 
     @BeforeEach
     void setUp() {
-        userRegistrationDto = new UserRegistrationDto();
-        userRegistrationDto.setEmail("email@gmail.com");
-        userRegistrationDto.setRole(Role.CANDIDATE);
-
-        userUpdateDto = new UserUpdateDto();
-        userUpdateDto.setEmail("email@gmail.com");
-
-        passwordUpdateDto = new PasswordUpdateDto();
-        passwordUpdateDto.setEmail("email@gmail.com");
-        passwordUpdateDto.setPassword("password");
-
         userEntity = new UserEntity();
         userEntity.setId(1L);
         userEntity.setEmail("email@gmail.com");
@@ -71,73 +55,79 @@ class UserServiceTest {
         userDto = new UserDto();
         userDto.setId(1L);
         userDto.setEmail("email@gmail.com");
-
-        roleEntity = new RoleEntity();
-        roleEntity.setName("CANDIDATE");
     }
 
     @Test
     void createUser_shouldThrowEmailDuplicateException_whenEmailExists() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
+        UserRegistrationDto userRegistrationDto = getRegistrationDto("email@gmail.com", Role.CANDIDATE);
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(userEntity));
 
-        assertThrows(EmailDuplicateException.class, () -> userService.createUser(userRegistrationDto));
-        verify(userRepository, times(1)).findByEmail(anyString());
+        assertThrows(EmailDuplicateException.class, () -> underTest.createUser(userRegistrationDto));
+        verify(userRepository, times(1)).findByEmail("email@gmail.com");
     }
 
     @Test
     void createUser_shouldCreateUser_whenEmailDoesNotExist() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(roleRepository.findByName(anyString())).thenReturn(Optional.of(roleEntity));
-        when(mapper.toEntity(any(UserRegistrationDto.class))).thenReturn(userEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        UserRegistrationDto userRegistrationDto = getRegistrationDto("email@gmail.com", Role.CANDIDATE);
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setName("CANDIDATE");
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
+        when(roleRepository.findByName("CANDIDATE")).thenReturn(Optional.of(roleEntity));
+        when(mapper.toEntity(userRegistrationDto)).thenReturn(userEntity);
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        UserDto result = userService.createUser(userRegistrationDto);
+        UserDto result = underTest.createUser(userRegistrationDto);
 
         assertNotNull(result);
-        assertEquals(userDto.getEmail(), result.getEmail());
-        verify(userRepository, times(1)).findByEmail(anyString());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
+        matchUserFields(result, userDto);
+        verify(userRepository, times(1)).findByEmail("email@gmail.com");
+        verify(userRepository, times(1)).save(userEntity);
     }
 
     @Test
     void updateUser_shouldThrowEmailDuplicateException_whenEmailExists() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
+        UserUpdateDto userUpdateDto = getUserUpdateDto("email@gmail.com");
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(userEntity));
 
-        assertThrows(EmailDuplicateException.class, () -> userService.updateUser(1L, userUpdateDto));
-        verify(userRepository, times(1)).findByEmail(anyString());
+        assertThrows(EmailDuplicateException.class, () -> underTest.updateUser(1L, userUpdateDto));
+        verify(userRepository, times(1)).findByEmail("email@gmail.com");
     }
 
     @Test
     void updateUser_shouldUpdateUser_whenEmailDoesNotExist() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(userEntity));
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        UserUpdateDto userUpdateDto = getUserUpdateDto("email@gmail.com");
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        UserDto result = userService.updateUser(1L, userUpdateDto);
+        UserDto result = underTest.updateUser(1L, userUpdateDto);
 
         assertNotNull(result);
-        assertEquals(userDto.getEmail(), result.getEmail());
-        verify(userRepository, times(1)).findById(anyLong());
+        matchUserFields(result, userDto);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void updateUserPassword_shouldUpdatePassword() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        PasswordUpdateDto passwordUpdateDto = new PasswordUpdateDto();
+        passwordUpdateDto.setPassword("password");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        UserDto result = userService.updateUserPassword(passwordUpdateDto);
+        UserDto result = underTest.updateUserPassword(1L, passwordUpdateDto);
 
         assertNotNull(result);
-        verify(userRepository, times(1)).findByEmail(anyString());
+        matchUserFields(result, userDto);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void getAllUsers_shouldReturnListOfUsers() {
         when(userRepository.findAll()).thenReturn(List.of(userEntity));
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        List<UserDto> result = userService.getAllUsers();
+        List<UserDto> result = underTest.getAllUsers();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -146,48 +136,58 @@ class UserServiceTest {
 
     @Test
     void getUserById_shouldReturnUser() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(userEntity));
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        UserDto result = userService.getUserById(1L);
+        UserDto result = underTest.getUserById(1L);
 
         assertNotNull(result);
-        verify(userRepository, times(1)).findById(anyLong());
+        matchUserFields(result, userDto);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void getUserById_shouldThrowNoSuchEntityException_whenUserNotFound() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchEntityException.class, () -> userService.getUserById(1L));
-        verify(userRepository, times(1)).findById(anyLong());
+        assertThrows(NoSuchEntityException.class, () -> underTest.getUserById(1L));
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void getUserByEmail_shouldReturnUser() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(userEntity));
-        when(mapper.toDto(any(UserEntity.class))).thenReturn(userDto);
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(userEntity));
+        when(mapper.toDto(userEntity)).thenReturn(userDto);
 
-        UserDto result = userService.getUserByEmail("email@gmail.com");
+        UserDto result = underTest.getUserByEmail("email@gmail.com");
 
         assertNotNull(result);
-        verify(userRepository, times(1)).findByEmail(anyString());
+        matchUserFields(result, userDto);
+        verify(userRepository, times(1)).findByEmail("email@gmail.com");
     }
 
     @Test
     void getUserByEmail_shouldThrowNoSuchEntityException_whenUserNotFound() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchEntityException.class, () -> userService.getUserByEmail("email@gmail.com"));
-        verify(userRepository, times(1)).findByEmail(anyString());
+        assertThrows(NoSuchEntityException.class, () -> underTest.getUserByEmail("email@gmail.com"));
+        verify(userRepository, times(1)).findByEmail("email@gmail.com");
     }
 
     @Test
     void deleteUser_shouldDeleteUser() {
-        doNothing().when(userRepository).deleteById(anyLong());
+        doNothing().when(userRepository).deleteById(1L);
 
-        userService.deleteUser(1L);
+        underTest.deleteUser(1L);
 
-        verify(userRepository, times(1)).deleteById(anyLong());
+        verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    private void matchUserFields(UserDto expected, UserDto actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getEmail(), actual.getEmail());
+        assertEquals(expected.getFirstName(), actual.getFirstName());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getRole(), actual.getRole());
     }
 }

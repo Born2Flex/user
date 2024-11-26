@@ -1,0 +1,9 @@
+name,message
+john,Name should start with an uppercase letter
+ALICE,Name should have only the first letter as uppercase and the rest lowercase
+J,Name should have at least 2 characters
+sarah,Name should start with an uppercase letter
+123abc,Name should start with an uppercase letter and contain only alphabetic characters
+emma@,Name should only contain alphabetic characters
+m1a,Name should contain only alphabetic characters
+123,Name should contain only alphabetic characters

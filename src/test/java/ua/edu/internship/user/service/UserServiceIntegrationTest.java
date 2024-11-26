@@ -18,46 +18,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static ua.edu.internship.user.utils.TestUtils.getRegistrationDto;
+import static ua.edu.internship.user.utils.TestUtils.getUserDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/data/test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(scripts = "/data/sql/test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class UserServiceIntegrationTest {
-    private final UserService userService;
+    private final UserService underTest;
     private UserDto savedUser;
     private UserDto savedInterviewer;
 
     @Autowired
-    public UserServiceIntegrationTest(UserService userService) {
-        this.userService = userService;
+    public UserServiceIntegrationTest(UserService underTest) {
+        this.underTest = underTest;
     }
 
     @BeforeEach
     void setUp() {
-        savedUser = new UserDto();
-        savedUser.setId(1L);
-        savedUser.setEmail("user@gmail.com");
-        savedUser.setFirstName("John");
-        savedUser.setLastName("Doe");
-        savedUser.setRole(Role.CANDIDATE);
-
-        savedInterviewer = new UserDto();
-        savedInterviewer.setId(2L);
-        savedInterviewer.setEmail("interviewer@gmail.com");
-        savedInterviewer.setFirstName("Jane");
-        savedInterviewer.setLastName("Doe");
-        savedInterviewer.setRole(Role.INTERVIEWER);
+        savedUser = getUserDto(1L, "John", "Doe", "user@gmail.com", Role.CANDIDATE);
+        savedInterviewer = getUserDto(2L, "Jane", "Doe", "interviewer@gmail.com", Role.INTERVIEWER);
     }
 
     @Test
     void createUser_shouldCreateUser_whenEmailDoesNotExist() {
-        UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
-        userRegistrationDto.setFirstName("John");
-        userRegistrationDto.setLastName("Doe");
-        userRegistrationDto.setEmail("newemail@gmail.com");
-        userRegistrationDto.setPassword("password");
-        userRegistrationDto.setRole(Role.CANDIDATE);
+        UserRegistrationDto userRegistrationDto =
+                getRegistrationDto("John", "Doe", "newemail@gmail.com", "password", Role.CANDIDATE);
 
-        UserDto result = userService.createUser(userRegistrationDto);
+        UserDto result = underTest.createUser(userRegistrationDto);
 
         assertNotNull(result);
         matchUserFields(userRegistrationDto, result);
@@ -70,12 +57,12 @@ class UserServiceIntegrationTest {
         userRegistrationDto.setPassword("password");
         userRegistrationDto.setRole(Role.CANDIDATE);
 
-        assertThrows(EmailDuplicateException.class, () -> userService.createUser(userRegistrationDto));
+        assertThrows(EmailDuplicateException.class, () -> underTest.createUser(userRegistrationDto));
     }
 
     @Test
     void getAllUsers_shouldReturnListOfUsers() {
-        List<UserDto> result = userService.getAllUsers();
+        List<UserDto> result = underTest.getAllUsers();
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -84,7 +71,7 @@ class UserServiceIntegrationTest {
 
     @Test
     void getUserById_shouldReturnUser() {
-        UserDto result = userService.getUserById(1L);
+        UserDto result = underTest.getUserById(1L);
 
         assertNotNull(result);
         matchUserFields(savedUser, result);
@@ -92,12 +79,12 @@ class UserServiceIntegrationTest {
 
     @Test
     void getUserById_shouldThrowNoSuchEntityException_whenUserNotFound() {
-        assertThrows(NoSuchEntityException.class, () -> userService.getUserById(999L));
+        assertThrows(NoSuchEntityException.class, () -> underTest.getUserById(999L));
     }
 
     @Test
     void getUserByEmail_shouldReturnUser() {
-        UserDto result = userService.getUserByEmail("user@gmail.com");
+        UserDto result = underTest.getUserByEmail("user@gmail.com");
 
         assertNotNull(result);
         matchUserFields(savedUser, result);
@@ -105,7 +92,7 @@ class UserServiceIntegrationTest {
 
     @Test
     void getUserByEmail_shouldThrowNoSuchEntityException_whenUserNotFound() {
-        assertThrows(NoSuchEntityException.class, () -> userService.getUserByEmail("nonexistentemail@gmail.com"));
+        assertThrows(NoSuchEntityException.class, () -> underTest.getUserByEmail("nonexistentemail@gmail.com"));
     }
 
     private void matchUserFields(UserRegistrationDto expected, UserDto actual) {

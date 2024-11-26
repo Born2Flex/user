@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[#?!@$%^&*-])[A-Za-z0-9#?!@$%^&*-]{8,}$");
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

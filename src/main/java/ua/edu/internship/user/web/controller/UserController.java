@@ -56,13 +56,13 @@ public class UserController {
         return service.updateUser(id, dto);
     }
 
-    @PatchMapping
+    @PatchMapping("/{id}")
     @Operation(summary = "Change user password")
     @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = UserDto.class),
             mediaType = "application/json")})
     @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
-    public UserDto updateUserPassword(@RequestBody @Valid PasswordUpdateDto dto) {
-        return service.updateUserPassword(dto);
+    public UserDto updateUserPassword(@PathVariable Long id, @RequestBody @Valid PasswordUpdateDto dto) {
+        return service.updateUserPassword(id, dto);
     }
 
     @GetMapping

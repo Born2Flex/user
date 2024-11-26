@@ -37,7 +37,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleLogicException(BaseException exception) {
         log.error(exception.getMessage(), exception);
-        ErrorResponse errorResponse = new ErrorResponse(exception.getCode(), exception.getMessage(), null);
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(exception.getCode())
+                .message(exception.getMessage())
+                .build();
         return new ResponseEntity<>(errorResponse, exception.getCode());
     }
 
@@ -46,6 +49,9 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ErrorResponse handleGenericException(Exception exception) {
         log.error("An unexpected error occurred: {}", exception.getMessage(), exception);
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null);
+        return ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message("Internal Server Error")
+                .build();
     }
 }
