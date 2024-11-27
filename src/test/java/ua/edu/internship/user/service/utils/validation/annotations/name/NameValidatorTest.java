@@ -3,7 +3,6 @@ package ua.edu.internship.user.service.utils.validation.annotations.name;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
-import org.junit.jupiter.params.provider.CsvFileSource;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +25,7 @@ class NameValidatorTest {
     };
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/data/validator/name/valid-names.csv", numLinesToSkip = 1)
+    @FieldSource("validNames")
     void testValidNames(String name) {
         assertTrue(underTest.isValid(name, context));
     }
