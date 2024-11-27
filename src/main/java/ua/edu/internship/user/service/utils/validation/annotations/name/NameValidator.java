@@ -10,6 +10,6 @@ public class NameValidator implements ConstraintValidator<Name, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return NAME_PATTERN.matcher(value).matches();
+        return value != null && NAME_PATTERN.matcher(value).matches();
     }
 }
