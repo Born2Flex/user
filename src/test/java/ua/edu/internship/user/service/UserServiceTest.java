@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ua.edu.internship.user.utils.TestUtils.getRegistrationDto;
@@ -63,7 +62,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(userEntity));
 
         assertThrows(EmailDuplicateException.class, () -> underTest.createUser(userRegistrationDto));
-        verify(userRepository, times(1)).findByEmail("email@gmail.com");
+        verify(userRepository).findByEmail("email@gmail.com");
     }
 
     @Test
@@ -81,8 +80,8 @@ class UserServiceTest {
 
         assertNotNull(result);
         matchUserFields(result, userDto);
-        verify(userRepository, times(1)).findByEmail("email@gmail.com");
-        verify(userRepository, times(1)).save(userEntity);
+        verify(userRepository).findByEmail("email@gmail.com");
+        verify(userRepository).save(userEntity);
     }
 
     @Test
@@ -91,7 +90,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(userEntity));
 
         assertThrows(EmailDuplicateException.class, () -> underTest.updateUser(1L, userUpdateDto));
-        verify(userRepository, times(1)).findByEmail("email@gmail.com");
+        verify(userRepository).findByEmail("email@gmail.com");
     }
 
     @Test
@@ -105,7 +104,7 @@ class UserServiceTest {
 
         assertNotNull(result);
         matchUserFields(result, userDto);
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository).findById(1L);
     }
 
     @Test
@@ -119,7 +118,7 @@ class UserServiceTest {
 
         assertNotNull(result);
         matchUserFields(result, userDto);
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository).findById(1L);
     }
 
     @Test
@@ -131,7 +130,7 @@ class UserServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(userRepository, times(1)).findAll();
+        verify(userRepository).findAll();
     }
 
     @Test
@@ -143,7 +142,7 @@ class UserServiceTest {
 
         assertNotNull(result);
         matchUserFields(result, userDto);
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository).findById(1L);
     }
 
     @Test
@@ -151,7 +150,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchEntityException.class, () -> underTest.getUserById(1L));
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository).findById(1L);
     }
 
     @Test
@@ -163,7 +162,7 @@ class UserServiceTest {
 
         assertNotNull(result);
         matchUserFields(result, userDto);
-        verify(userRepository, times(1)).findByEmail("email@gmail.com");
+        verify(userRepository).findByEmail("email@gmail.com");
     }
 
     @Test
@@ -171,7 +170,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
 
         assertThrows(NoSuchEntityException.class, () -> underTest.getUserByEmail("email@gmail.com"));
-        verify(userRepository, times(1)).findByEmail("email@gmail.com");
+        verify(userRepository).findByEmail("email@gmail.com");
     }
 
     @Test
@@ -180,7 +179,7 @@ class UserServiceTest {
 
         underTest.deleteUser(1L);
 
-        verify(userRepository, times(1)).deleteById(1L);
+        verify(userRepository).deleteById(1L);
     }
 
     private void matchUserFields(UserDto expected, UserDto actual) {
