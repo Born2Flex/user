@@ -1,0 +1,19 @@
+domain:
+  back: ${BACK_URI:http://localhost:8080}
+project:
+  version: '@project.version@'
+spring:
+  application:
+    name: user
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
