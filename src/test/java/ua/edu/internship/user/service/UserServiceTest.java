@@ -1,17 +1,17 @@
 package ua.edu.internship.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ua.edu.internship.user.utils.TestUtils.getRegistrationDto;
 import static ua.edu.internship.user.utils.TestUtils.getUserUpdateDto;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -180,6 +180,28 @@ class UserServiceTest {
         underTest.deleteUser(1L);
 
         verify(userRepository).deleteById(1L);
+    }
+
+    @Test
+    void shouldReturnTrueWhenUserExists() {
+        Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(true);
+
+        boolean result = underTest.userExists(userId);
+
+        assertTrue(result);
+        verify(userRepository).existsById(userId);
+    }
+
+    @Test
+    void shouldReturnFalseWhenUserDoesNotExists() {
+        Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        boolean result = underTest.userExists(userId);
+
+        assertFalse(result);
+        verify(userRepository).existsById(userId);
     }
 
     private void matchUserFields(UserDto expected, UserDto actual) {

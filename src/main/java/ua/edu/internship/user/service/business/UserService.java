@@ -82,6 +82,11 @@ public class UserService {
         log.info("User with id: {} deleted successfully", id);
     }
 
+    public boolean userExists(Long id) {
+        log.info("Validating that user with id: {} exists", id);
+        return userRepository.existsById(id);
+    }
+
     private UserEntity getUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchEntityException("User not found"));

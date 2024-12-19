@@ -99,4 +99,12 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         service.deleteUser(id);
     }
+
+    @GetMapping("/exists/{id}")
+    @Operation(summary = "Check if a user exists by id")
+    @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = Boolean.class),
+            mediaType = "application/json")})
+    public boolean userExists(@PathVariable Long id) {
+        return service.userExists(id);
+    }
 }
