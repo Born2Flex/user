@@ -1,6 +1,8 @@
 package ua.edu.internship.user.service;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,9 +13,7 @@ import ua.edu.internship.user.service.dto.user.UserRegistrationDto;
 import ua.edu.internship.user.service.enumeration.Role;
 import ua.edu.internship.user.service.utils.exceptions.EmailDuplicateException;
 import ua.edu.internship.user.service.utils.exceptions.NoSuchEntityException;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,6 +23,7 @@ import static ua.edu.internship.user.utils.TestUtils.getUserDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/data/sql/test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Transactional
 class UserServiceIntegrationTest {
     private final UserService underTest;
     private UserDto savedUser;
@@ -40,58 +41,86 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    void createUser_shouldCreateUser_whenEmailDoesNotExist() {
+    @DisplayName("Should create new user when email is not already in use")
+    void shouldCreateUserWhenEmailDoesNotExist() {
+        // given
         UserRegistrationDto userRegistrationDto =
                 getRegistrationDto("John", "Doe", "newemail@gmail.com", "password", Role.CANDIDATE);
 
+        // when
         UserDto result = underTest.createUser(userRegistrationDto);
 
+        // then
         assertNotNull(result);
         matchUserFields(userRegistrationDto, result);
     }
 
     @Test
-    void createUser_shouldThrowEmailDuplicateException_whenEmailExists() {
+    @DisplayName("Should throw EmailDuplicateException when trying to create user with email that is already exists")
+    void shouldThrowEmailDuplicateExceptionWhenEmailExists() {
+        // given
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
         userRegistrationDto.setEmail("user@gmail.com");
         userRegistrationDto.setPassword("password");
         userRegistrationDto.setRole(Role.CANDIDATE);
 
+        // when
+        // then
         assertThrows(EmailDuplicateException.class, () -> underTest.createUser(userRegistrationDto));
     }
 
     @Test
-    void getAllUsers_shouldReturnListOfUsers() {
+    @DisplayName("Should return list of all users stored in DB")
+    void getAllUsersShouldReturnListOfUsers() {
+        // given
+        // when
         List<UserDto> result = underTest.getAllUsers();
 
+        // then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertTrue(result.containsAll(List.of(savedUser, savedInterviewer)));
     }
 
     @Test
-    void getUserById_shouldReturnUser() {
+    @DisplayName("Should return user by ID")
+    void getUserByIdShouldReturnUser() {
+        // given
+        // when
         UserDto result = underTest.getUserById(1L);
 
+        // then
         assertNotNull(result);
         matchUserFields(savedUser, result);
     }
 
     @Test
-    void getUserById_shouldThrowNoSuchEntityException_whenUserNotFound() {
+    @DisplayName("Should throw NoSuchEntityException when user does not exists by ID")
+    void shouldThrowExceptionWhenUserNotFoundByID() {
+        // given
+        // when
+        // then
         assertThrows(NoSuchEntityException.class, () -> underTest.getUserById(999L));
     }
 
     @Test
-    void getUserByEmail_shouldReturnUser() {
+    @DisplayName("Should return user by email")
+    void shouldReturnUserByEmail() {
+        // given
+        // when
         UserDto result = underTest.getUserByEmail("user@gmail.com");
 
+        // then
         assertNotNull(result);
         matchUserFields(savedUser, result);
     }
 
     @Test
-    void getUserByEmail_shouldThrowNoSuchEntityException_whenUserNotFound() {
+    @DisplayName("Should throw NoSuchEntityException when user does not exists by email")
+    void shouldThrowExceptionWhenUserNotFoundByEmail() {
+        // given
+        // when
+        // then
         assertThrows(NoSuchEntityException.class, () -> underTest.getUserByEmail("nonexistentemail@gmail.com"));
     }
 

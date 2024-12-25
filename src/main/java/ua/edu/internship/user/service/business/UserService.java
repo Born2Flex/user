@@ -15,6 +15,7 @@ import ua.edu.internship.user.service.mapper.UserMapper;
 import ua.edu.internship.user.data.repository.RoleRepository;
 import ua.edu.internship.user.data.repository.UserRepository;
 import ua.edu.internship.user.service.message.user.BaseUserMessage;
+import ua.edu.internship.user.service.message.user.UserDeletedMessage;
 import ua.edu.internship.user.service.message.user.UserRegisteredMessage;
 import ua.edu.internship.user.service.notification.NotificationSender;
 import ua.edu.internship.user.service.utils.exceptions.EmailDuplicateException;
@@ -93,7 +94,7 @@ public class UserService {
     }
 
     private BaseUserMessage createDeletionNotification(UserEntity user) {
-        return new UserRegisteredMessage(user.getEmail(), user.getFullName());
+        return new UserDeletedMessage(user.getEmail(), user.getFullName());
     }
 
     public boolean userExists(Long id) {

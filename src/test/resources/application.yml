@@ -10,6 +10,9 @@ spring:
     username: sa
     password: password
     driverClassName: org.h2.Driver
+  activemq:
+    embedded:
+      enabled: false
   h2:
     console:
       enabled: true
@@ -17,3 +20,5 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+user:
+  queue: user-queue
