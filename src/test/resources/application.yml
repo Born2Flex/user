@@ -10,9 +10,6 @@ spring:
     username: sa
     password: password
     driverClassName: org.h2.Driver
-  activemq:
-    embedded:
-      enabled: false
   h2:
     console:
       enabled: true

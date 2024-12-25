@@ -35,6 +35,7 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <mockito-core.version>5.14.2</mockito-core.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.7.0</springdoc-openapi-starter-webmvc-ui.version>
+        <activemq-broker.version>6.1.4</activemq-broker.version>
     </properties>
     <dependencies>
         <dependency>
@@ -96,6 +97,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemq-broker.version}</version>
         </dependency>
     </dependencies>
 
