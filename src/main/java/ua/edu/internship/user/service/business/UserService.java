@@ -1,7 +1,6 @@
 package ua.edu.internship.user.service.business;
 
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,9 @@ import ua.edu.internship.user.service.enumeration.Role;
 import ua.edu.internship.user.service.mapper.UserMapper;
 import ua.edu.internship.user.data.repository.RoleRepository;
 import ua.edu.internship.user.data.repository.UserRepository;
+import ua.edu.internship.user.service.message.user.BaseUserMessage;
+import ua.edu.internship.user.service.message.user.UserRegisteredMessage;
+import ua.edu.internship.user.service.notification.NotificationSender;
 import ua.edu.internship.user.service.utils.exceptions.EmailDuplicateException;
 import ua.edu.internship.user.service.utils.exceptions.NoSuchEntityException;
 
@@ -25,6 +27,7 @@ public class UserService {
     private final UserMapper mapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final NotificationSender notificationSender;
 
     public UserDto createUser(UserRegistrationDto dto) {
         log.info("Attempting to create new user");
@@ -34,7 +37,12 @@ public class UserService {
         userEntity.setRole(roleEntity);
         UserDto createdUser = mapper.toDto(userRepository.save(userEntity));
         log.info("Created new user with id = {}", createdUser.getId());
+        notificationSender.sendNotification(createRegistrationNotification(userEntity));
         return createdUser;
+    }
+
+    private BaseUserMessage createRegistrationNotification(UserEntity user) {
+        return new UserRegisteredMessage(user.getEmail(), user.getFullName());
     }
 
     public UserDto updateUser(Long id, UserUpdateDto dto) {
@@ -78,8 +86,14 @@ public class UserService {
 
     public void deleteUser(Long id) {
         log.info("Attempting to delete user with id: {}", id);
+        UserEntity user = getUserByIdOrElseThrow(id);
         userRepository.deleteById(id);
+        notificationSender.sendNotification(createDeletionNotification(user));
         log.info("User with id: {} deleted successfully", id);
+    }
+
+    private BaseUserMessage createDeletionNotification(UserEntity user) {
+        return new UserRegisteredMessage(user.getEmail(), user.getFullName());
     }
 
     public boolean userExists(Long id) {

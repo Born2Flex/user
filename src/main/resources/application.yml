@@ -1,6 +1,10 @@
 spring:
   application:
     name: user
+  activemq:
+    broker-url: tcp://localhost:61616
+user:
+  queue: user-queue
 project:
   version: '@project.version@'
 domain:
