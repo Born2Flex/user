@@ -26,6 +26,7 @@ public class JwtService {
     @Value("${jwt.expiration-time-minutes}")
     private long expirationTime;
     private final ObjectMapper mapper;
+    public static final TypeReference<Map<String, Object>> TOKEN_DATA_TYPE_REF = new TypeReference<>() {};
 
     public boolean isExpired(String token) {
         try {
@@ -55,13 +56,13 @@ public class JwtService {
         Date issuedDateTime = new Date(System.currentTimeMillis());
         Date expirationDateTime = new Date(System.currentTimeMillis() + expirationTime * 60 * 1000);
         return Jwts.builder()
-                .claims(mapper.convertValue(tokenData, new TypeReference<Map<String, Object>>() {}))
+                .claims(mapper.convertValue(tokenData, TOKEN_DATA_TYPE_REF))
                 .issuedAt(issuedDateTime)
                 .expiration(expirationDateTime)
                 .signWith(getSigningKey()).compact();
     }
 
-    private SecretKey getSigningKey() {
+    public SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }

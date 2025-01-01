@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "permissions")
 public class PermissionEntity implements GrantedAuthority {
