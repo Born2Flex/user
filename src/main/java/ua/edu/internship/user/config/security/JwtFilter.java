@@ -10,13 +10,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ua.edu.internship.user.service.business.JwtService;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -47,7 +48,11 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             AuthDetails authDetails = jwtService.parseToken(token);
             SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(authDetails, null, List.of(authDetails::getAuthority))
+                    new UsernamePasswordAuthenticationToken(authDetails, null,
+                            authDetails.getPermissions().stream()
+                                    .map(SimpleGrantedAuthority::new)
+                                    .collect(Collectors.toSet())
+                    )
             );
         } catch (Exception e) {
             log.error("Invalid token: {}", e.getMessage());

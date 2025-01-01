@@ -10,11 +10,15 @@ spring:
       ddl-auto: update
   activemq:
     broker-url: tcp://localhost:61616
+  security:
+    user:
+      name:
+      password:
 user:
   queue: user-queue
 project:
   version: '@project.version@'
   security:
-    permit-all: /login, /register, /swagger-ui/**, /v3/api-docs/**
+    permit-all: /auth/**, /swagger-ui/**, /v3/api-docs/**
 domain:
   back: ${BACK_URI:http://localhost:8080}

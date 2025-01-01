@@ -1,36 +1,30 @@
-package ua.edu.internship.user.service.business;
+package ua.edu.internship.user.service.utils.jwt;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import ua.edu.internship.user.config.security.AuthDetails;
+import ua.edu.internship.user.data.entity.UserEntity;
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 
 @Slf4j
-@Service
-@RequiredArgsConstructor
-public class JwtService {
+public final class JwtUtils {
     @Value("${jwt.secret}")
-    private String secret;
+    private static String secret;
     @Value("${jwt.expiration-time-minutes}")
-    private long expirationTime;
-    private final ObjectMapper mapper;
+    private static long expirationTime;
 
     public boolean isExpired(String token) {
         try {
             return getClaims(token).getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
+            log.info("JWT token expired", e);
             return true;
         } catch (JwtException e) {
             log.error("Invalid JWT token", e);
@@ -38,12 +32,23 @@ public class JwtService {
         }
     }
 
-    public AuthDetails parseToken(String token) {
-        Claims claims = getClaims(token);
-        return mapper.convertValue(claims, AuthDetails.class);
+    public String generateToken(UserEntity user) {
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .claim("id", user.getId())
+                .claim("roles", user.getRole())
+                .claim("permissions", user.getRole().getPermissions())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .compact();
     }
 
-    public Claims getClaims(String token) {
+    public String getUserId(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -51,11 +56,11 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String generateToken(AuthDetails authDetails) {
+    public String generateToken(String id) {
         Date issuedDateTime = new Date(System.currentTimeMillis());
         Date expirationDateTime = new Date(System.currentTimeMillis() + expirationTime * 60 * 1000);
         return Jwts.builder()
-                .claims(mapper.convertValue(authDetails, new TypeReference<Map<String, Object>>() {}))
+                .subject(id)
                 .issuedAt(issuedDateTime)
                 .expiration(expirationDateTime)
                 .signWith(getSigningKey()).compact();

@@ -5,10 +5,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.edu.internship.user.config.security.AuthDetails;
+import ua.edu.internship.user.data.entity.PermissionEntity;
 import ua.edu.internship.user.data.entity.UserEntity;
 import ua.edu.internship.user.data.repository.UserRepository;
 import ua.edu.internship.user.service.dto.auth.LoginDto;
 import ua.edu.internship.user.service.dto.auth.TokenDto;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,11 @@ public class AuthService {
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Wrong password");
         }
-        String token = jwtService.generateToken(new AuthDetails(user.getId(), user.getRole().getName()));
+        Set<String> permissions = user.getRole().getPermissions()
+                .stream()
+                .map(PermissionEntity::getName)
+                .collect(Collectors.toSet());
+        String token = jwtService.generateToken(new AuthDetails(user.getId(), permissions));
         return new TokenDto(token);
     }
 }
