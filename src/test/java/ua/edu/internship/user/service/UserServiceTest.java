@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.edu.internship.user.service.dto.user.PasswordUpdateDto;
 import ua.edu.internship.user.service.dto.user.UserDto;
 import ua.edu.internship.user.service.dto.user.UserRegistrationDto;
@@ -40,6 +41,8 @@ import ua.edu.internship.user.service.utils.exceptions.NoSuchEntityException;
 class UserServiceTest {
     @Mock
     private UserMapper mapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -87,7 +90,7 @@ class UserServiceTest {
         UserRegisteredMessage notification = new UserRegisteredMessage("email@gmail.com", "John Doe");
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
         when(roleRepository.findByName("CANDIDATE")).thenReturn(Optional.of(roleEntity));
-        when(mapper.toEntity(userRegistrationDto)).thenReturn(userEntity);
+        when(mapper.mapWithEncodedPassword(userRegistrationDto, passwordEncoder)).thenReturn(userEntity);
         when(userRepository.save(userEntity)).thenReturn(userEntity);
         when(mapper.toDto(userEntity)).thenReturn(userDto);
         doNothing().when(notificationSender).sendNotification(notification);
@@ -112,7 +115,7 @@ class UserServiceTest {
         UserRegisteredMessage notification = new UserRegisteredMessage("email@gmail.com", "John Doe");
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
         when(roleRepository.findByName("CANDIDATE")).thenReturn(Optional.of(roleEntity));
-        when(mapper.toEntity(userRegistrationDto)).thenReturn(userEntity);
+        when(mapper.mapWithEncodedPassword(userRegistrationDto, passwordEncoder)).thenReturn(userEntity);
         when(userRepository.save(userEntity)).thenReturn(userEntity);
         when(mapper.toDto(userEntity)).thenReturn(userDto);
         doNothing().when(notificationSender).sendNotification(notification);
