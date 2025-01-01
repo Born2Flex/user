@@ -7,14 +7,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
-
 import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +22,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "permissions")
-public class PermissionEntity {
+public class PermissionEntity implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -35,4 +34,9 @@ public class PermissionEntity {
 
     @ManyToMany(mappedBy = "permissions")
     private Set<RoleEntity> roles;
+
+    @Override
+    public String getAuthority() {
+        return name;
+    }
 }

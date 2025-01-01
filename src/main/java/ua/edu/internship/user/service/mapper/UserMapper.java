@@ -4,6 +4,7 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.edu.internship.user.service.dto.user.UserDto;
 import ua.edu.internship.user.service.dto.user.UserRegistrationDto;
 import ua.edu.internship.user.service.dto.user.UserUpdateDto;
@@ -20,4 +21,10 @@ public interface UserMapper {
     void updateEntity(UserUpdateDto dto, @MappingTarget UserEntity entity);
 
     void updatePassword(String password, @MappingTarget UserEntity entity);
+
+    default UserEntity mapWithEncodedPassword(UserRegistrationDto dto, PasswordEncoder passwordEncoder) {
+        UserEntity userEntity = toEntity(dto);
+        userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        return userEntity;
+    }
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.edu.internship.user.config.security.AuthDetails;
+import ua.edu.internship.user.config.security.TokenData;
 import ua.edu.internship.user.data.entity.PermissionEntity;
 import ua.edu.internship.user.data.entity.UserEntity;
 import ua.edu.internship.user.data.repository.UserRepository;
@@ -29,7 +29,7 @@ public class AuthService {
                 .stream()
                 .map(PermissionEntity::getName)
                 .collect(Collectors.toSet());
-        String token = jwtService.generateToken(new AuthDetails(user.getId(), permissions));
+        String token = jwtService.generateToken(new TokenData(user.getId(), permissions));
         return new TokenDto(token);
     }
 }

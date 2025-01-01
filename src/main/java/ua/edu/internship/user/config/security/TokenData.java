@@ -8,7 +8,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthDetails {
+public class TokenData {
     private Long id;
     private Set<String> permissions;
 }

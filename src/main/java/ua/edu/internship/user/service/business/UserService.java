@@ -3,6 +3,7 @@ package ua.edu.internship.user.service.business;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.edu.internship.user.service.dto.user.PasswordUpdateDto;
 import ua.edu.internship.user.service.dto.user.UserDto;
@@ -29,11 +30,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final NotificationSender notificationSender;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDto createUser(UserRegistrationDto dto) {
         log.info("Attempting to create new user");
         checkForDuplicateEmail(dto.getEmail());
-        UserEntity userEntity = mapper.toEntity(dto);
+        UserEntity userEntity = mapper.mapWithEncodedPassword(dto, passwordEncoder);
         RoleEntity roleEntity = getRoleOrElseThrow(dto.getRole());
         userEntity.setRole(roleEntity);
         UserDto createdUser = mapper.toDto(userRepository.save(userEntity));

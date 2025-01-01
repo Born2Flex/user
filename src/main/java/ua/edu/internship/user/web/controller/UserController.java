@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import ua.edu.internship.user.service.dto.user.PasswordUpdateDto;
 import ua.edu.internship.user.service.dto.user.UserDto;
 import ua.edu.internship.user.service.dto.user.UserRegistrationDto;

@@ -1,6 +1,5 @@
 package ua.edu.internship.user.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,15 +7,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ua.edu.internship.user.service.business.JwtService;
+import ua.edu.internship.user.service.utils.exceptions.InvalidTokenException;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String AUTH_HEADER = "Authorization";
     private final JwtService jwtService;
-    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -34,39 +33,31 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.debug("Processing request on URI: {}", request.getRequestURI());
         String authHeader = request.getHeader(AUTH_HEADER);
-
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String token = authHeader.substring(BEARER_PREFIX.length());
-        try {
-            if (jwtService.isExpired(token)) {
-                log.info("Token is expired");
-                setApiErrorResponse(response, "Token expired", 6);
-                return;
-            }
-            AuthDetails authDetails = jwtService.parseToken(token);
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(authDetails, null,
-                            authDetails.getPermissions().stream()
-                                    .map(SimpleGrantedAuthority::new)
-                                    .collect(Collectors.toSet())
-                    )
-            );
-        } catch (Exception e) {
-            log.error("Invalid token: {}", e.getMessage());
-            setApiErrorResponse(response, "Invalid token", 7);
-            return;
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            String token = authHeader.substring(BEARER_PREFIX.length());
+            validateTokenIsNotExpired(token);
+            processTokenAuthentication(token);
         }
         filterChain.doFilter(request, response);
     }
 
-    private void setApiErrorResponse(HttpServletResponse response, String message, int errorCode) throws IOException {
-        ApiErrorDto apiError = new ApiErrorDto(LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), message, errorCode);
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(apiError));
-        response.getWriter().flush();
+    private void validateTokenIsNotExpired(String token) {
+        if (jwtService.isExpired(token)) {
+            throw new InvalidTokenException("Token is expired");
+        }
+    }
+
+    private void processTokenAuthentication(String token) {
+        try {
+            TokenData tokenData = jwtService.parseToken(token);
+            Set<GrantedAuthority> authorities = tokenData.getPermissions().stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+            SecurityContextHolder.getContext()
+                    .setAuthentication(new UsernamePasswordAuthenticationToken(tokenData, null, authorities));
+        } catch (Exception e) {
+            log.error("Invalid token: {}", e.getMessage());
+            throw new InvalidTokenException("Invalid token");
+        }
     }
 }

@@ -10,6 +10,8 @@ spring:
       ddl-auto: update
   activemq:
     broker-url: tcp://localhost:61616
+    user: admin
+    password: password
   security:
     user:
       name:
@@ -22,3 +24,6 @@ project:
     permit-all: /auth/**, /swagger-ui/**, /v3/api-docs/**
 domain:
   back: ${BACK_URI:http://localhost:8080}
+jwt:
+  secret: 53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855
+  expiration-time-minutes: 10

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ua.edu.internship.user.config.security.AuthDetails;
+import ua.edu.internship.user.config.security.TokenData;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
@@ -38,9 +38,9 @@ public class JwtService {
         }
     }
 
-    public AuthDetails parseToken(String token) {
+    public TokenData parseToken(String token) {
         Claims claims = getClaims(token);
-        return mapper.convertValue(claims, AuthDetails.class);
+        return mapper.convertValue(claims, TokenData.class);
     }
 
     public Claims getClaims(String token) {
@@ -51,11 +51,11 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String generateToken(AuthDetails authDetails) {
+    public String generateToken(TokenData tokenData) {
         Date issuedDateTime = new Date(System.currentTimeMillis());
         Date expirationDateTime = new Date(System.currentTimeMillis() + expirationTime * 60 * 1000);
         return Jwts.builder()
-                .claims(mapper.convertValue(authDetails, new TypeReference<Map<String, Object>>() {}))
+                .claims(mapper.convertValue(tokenData, new TypeReference<Map<String, Object>>() {}))
                 .issuedAt(issuedDateTime)
                 .expiration(expirationDateTime)
                 .signWith(getSigningKey()).compact();
