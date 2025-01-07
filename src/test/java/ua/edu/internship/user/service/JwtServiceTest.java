@@ -2,7 +2,6 @@ package ua.edu.internship.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.edu.internship.user.config.security.TokenData;
 import ua.edu.internship.user.service.business.JwtService;
+import ua.edu.internship.user.service.utils.exceptions.InvalidTokenException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,6 +96,6 @@ class JwtServiceTest {
 
         // when
         // then
-        assertThrows(JwtException.class, () -> jwtService.isExpired(invalidToken));
+        assertThrows(InvalidTokenException.class, () -> jwtService.isExpired(invalidToken));
     }
 }
