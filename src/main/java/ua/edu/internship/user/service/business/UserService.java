@@ -22,6 +22,16 @@ import ua.edu.internship.user.service.notification.NotificationSender;
 import ua.edu.internship.user.service.utils.exceptions.EmailDuplicateException;
 import ua.edu.internship.user.service.utils.exceptions.NoSuchEntityException;
 
+/**
+ * Service responsible for managing user operations.
+ * <p>
+ * This service handles user creation, updates, retrieval, and deletion.
+ *
+ * @see PasswordEncoder
+ * @see UserRepository
+ * @see RoleRepository
+ * @see NotificationSender
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,11 +42,18 @@ public class UserService {
     private final NotificationSender notificationSender;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDto createUser(UserRegistrationDto dto) {
+    /**
+     * Creates a new user with the provided registration data.
+     *
+     * @param registrationDto {@link UserRegistrationDto} containing user registration details.
+     * @return {@link UserDto} created user.
+     * @throws EmailDuplicateException if user with such email already exists.
+     */
+    public UserDto createUser(UserRegistrationDto registrationDto) {
         log.info("Attempting to create new user");
-        checkForDuplicateEmail(dto.getEmail());
-        UserEntity userEntity = mapper.mapWithEncodedPassword(dto, passwordEncoder);
-        RoleEntity roleEntity = getRoleOrElseThrow(dto.getRole());
+        checkForDuplicateEmail(registrationDto.getEmail());
+        UserEntity userEntity = mapper.mapWithEncodedPassword(registrationDto, passwordEncoder);
+        RoleEntity roleEntity = getRoleOrElseThrow(registrationDto.getRole());
         userEntity.setRole(roleEntity);
         UserDto createdUser = mapper.toDto(userRepository.save(userEntity));
         log.info("Created new user with id = {}", createdUser.getId());
@@ -48,24 +65,46 @@ public class UserService {
         return new UserRegisteredMessage(user.getEmail(), user.getFullName());
     }
 
-    public UserDto updateUser(Long id, UserUpdateDto dto) {
+    /**
+     * Updates an existing user.
+     *
+     * @param id ID of the user to update.
+     * @param updateDto {@link UserUpdateDto} containing updated user data.
+     * @return {@link UserDto} updated user.
+     * @throws NoSuchEntityException if the user with specified ID does not exist.
+     * @throws EmailDuplicateException if user with such email already exists.
+     */
+    public UserDto updateUser(Long id, UserUpdateDto updateDto) {
         log.info("Attempting to update user with ID: {}", id);
-        checkForDuplicateEmail(dto.getEmail());
+        checkForDuplicateEmail(updateDto.getEmail());
         UserEntity userEntity = getUserByIdOrElseThrow(id);
-        mapper.updateEntity(dto, userEntity);
+        mapper.updateEntity(updateDto, userEntity);
         UserDto updatedUser = mapper.toDto(userEntity);
         log.info("User with id: {} updated successfully", updatedUser.getId());
         return updatedUser;
     }
 
-    public UserDto updateUserPassword(Long id, PasswordUpdateDto dto) {
+    /**
+     * Updates the password of an existing user.
+     *
+     * @param id ID of the user to update password.
+     * @param passwordDto {@link PasswordUpdateDto} containing the new password.
+     * @return {@link UserDto} user with updated password.
+     * @throws NoSuchEntityException if the user with specified ID does not exist.
+     */
+    public UserDto updateUserPassword(Long id, PasswordUpdateDto passwordDto) {
         log.info("Attempting to update password of user with id: {}", id);
         UserEntity userEntity = getUserByIdOrElseThrow(id);
-        mapper.updatePassword(dto.getPassword(), userEntity);
+        mapper.updatePassword(passwordDto.getPassword(), userEntity);
         log.info("Password for user with id: {} updated successfully", id);
         return mapper.toDto(userEntity);
     }
 
+    /**
+     * Retrieves all existing users.
+     *
+     * @return a list of {@link UserDto}.
+     */
     public List<UserDto> getAllUsers() {
         List<UserDto> users = userRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -74,12 +113,26 @@ public class UserService {
         return users;
     }
 
+    /**
+     * Retrieves user by ID.
+     *
+     * @param id ID of the user.
+     * @return {@link UserDto} user with specified ID.
+     * @throws NoSuchEntityException if the user with specified ID does not exist.
+     */
     public UserDto getUserById(Long id) {
         UserDto user = mapper.toDto(getUserByIdOrElseThrow(id));
         log.info("Retrieved user with id: {}", id);
         return user;
     }
 
+    /**
+     * Retrieves a user by their email.
+     *
+     * @param email email of the user.
+     * @return {@link UserDto} user with specified email.
+     * @throws NoSuchEntityException if the user with specified email does not exist.
+     */
     public UserDto getUserByEmail(String email) {
         UserDto user = mapper.toDto(userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchEntityException("User not found")));
@@ -87,6 +140,12 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Deletes a user by ID and sends a notification.
+     *
+     * @param id ID of the user.
+     * @throws NoSuchEntityException if the user with specified ID does not exist.
+     */
     public void deleteUser(Long id) {
         log.info("Attempting to delete user with id: {}", id);
         UserEntity user = getUserByIdOrElseThrow(id);
@@ -99,6 +158,12 @@ public class UserService {
         return new UserDeletedMessage(user.getEmail(), user.getFullName());
     }
 
+    /**
+     * Checks if a user exists by ID.
+     *
+     * @param id ID of the user.
+     * @return {@code true} if the user exists, {@code false} otherwise.
+     */
     public boolean userExists(Long id) {
         log.info("Validating that user with id: {} exists", id);
         return userRepository.existsById(id);

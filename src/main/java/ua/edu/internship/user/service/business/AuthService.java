@@ -13,6 +13,13 @@ import ua.edu.internship.user.service.dto.auth.TokenDto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for user authentication.
+ *
+ * @see PasswordEncoder
+ * @see JwtService
+ * @see UserRepository
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -20,11 +27,21 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public TokenDto authenticate(LoginDto dto) {
-        UserEntity user = userRepo.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
+    /**
+     * Authenticates a user based on their login credentials and generates a JWT token.
+     * <p>
+     * This method validates the provided email and password, retrieves the user's role and permissions,
+     * and issues a secure JWT token to facilitate authenticated access to the system.
+     *
+     * @param loginDto {@link LoginDto} containing the user's email and password.
+     * @return {@link TokenDto} with the generated JWT token.
+     * @throws BadCredentialsException if the provided credentials are invalid.
+     */
+    public TokenDto authenticate(LoginDto loginDto) {
+        UserEntity user = userRepo.findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Wrong password");
         }
         Set<String> permissions = user.getRole().getPermissions()
                 .stream()
