@@ -27,6 +27,9 @@ import ua.edu.internship.user.service.utils.exceptions.NoSuchEntityException;
  * <p>
  * This service handles user creation, updates, retrieval, and deletion.
  *
+ * @author Danylo Shlapak
+ * @version 1.1
+ * @since 1.0
  * @see PasswordEncoder
  * @see UserRepository
  * @see RoleRepository
@@ -44,7 +47,14 @@ public class UserService {
 
     /**
      * Creates a new user with the provided registration data.
-     *
+     * <p>
+     * Example:
+     * <pre>
+     * {@code
+     * UserRegistrationDto dto = new UserRegistrationDto("email@example.com", "password", Role.USER);
+     * UserDto user = userService.createUser(dto);
+     * }
+     * </pre>
      * @param registrationDto {@link UserRegistrationDto} containing user registration details.
      * @return {@link UserDto} created user.
      * @throws EmailDuplicateException if user with such email already exists.

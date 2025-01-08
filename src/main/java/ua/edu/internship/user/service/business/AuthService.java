@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 /**
  * Service responsible for user authentication.
  *
+ * @author Danylo Shlapak
+ * @version 1.1
+ * @since 1.1
  * @see PasswordEncoder
  * @see JwtService
  * @see UserRepository
@@ -32,7 +35,18 @@ public class AuthService {
      * <p>
      * This method validates the provided email and password, retrieves the user's role and permissions,
      * and issues a secure JWT token to facilitate authenticated access to the system.
-     *
+     * <p>
+     * Example:
+     * <pre>
+     * {@code
+     * LoginDto loginDto = new LoginDto("email@example.com", "password");
+     * TokenDto token = authService.authenticate(loginDto);
+     * }
+     * </pre>
+     * Example JWT Token:
+     * <pre>
+     * {@code eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c}
+     * </pre>
      * @param loginDto {@link LoginDto} containing the user's email and password.
      * @return {@link TokenDto} with the generated JWT token.
      * @throws BadCredentialsException if the provided credentials are invalid.

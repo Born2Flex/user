@@ -24,6 +24,9 @@ import java.util.Map;
  * This service provides methods to generate, validate, and parse JWT tokens,
  * as well as extract claims and manage token expiration.
  *
+ * @author Danylo Shlapak
+ * @version 1.1
+ * @since 1.1
  * @see ObjectMapper
  * @see Jwts
  * @see Claims
@@ -41,7 +44,14 @@ public class JwtService {
 
     /**
      * Checks if a JWT token has expired.
-     *
+     * <p>
+     * Example:
+     * <pre>
+     * {@code
+     * LoginDto loginDto = new LoginDto("email@example.com", "password");
+     * TokenDto token = authService.authenticate(loginDto);
+     * }
+     * </pre>
      * @param token the JWT token to validate.
      * @return {@code true} if the token has expired, {@code false} otherwise.
      * @throws InvalidTokenException if the token is invalid.
