@@ -53,9 +53,9 @@ public class AuthService {
      */
     public TokenDto authenticate(LoginDto loginDto) {
         UserEntity user = userRepo.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Wrong password");
+            throw new BadCredentialsException("Invalid email or password");
         }
         Set<String> permissions = user.getRole().getPermissions()
                 .stream()
