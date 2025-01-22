@@ -21,9 +21,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public TokenDto authenticate(LoginDto dto) {
-        UserEntity user = userRepo.findByEmail(dto.getEmail()).orElseThrow();
+        UserEntity user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Wrong password");
+            throw new BadCredentialsException("Invalid email or password");
         }
         Set<String> permissions = user.getRole().getPermissions()
                 .stream()
