@@ -8,7 +8,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,14 +32,19 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JwtService {
-    @Value("${jwt.secret}")
-    private String secret;
-    @Value("${jwt.expiration-time-minutes}")
-    private long expirationTime;
+    private final String secret;
+    private final long expirationTime;
     private final ObjectMapper mapper;
     public static final TypeReference<Map<String, Object>> TOKEN_DATA_TYPE_REF = new TypeReference<>() {};
+
+    public JwtService(@Value("${jwt.secret}") String secret,
+                      @Value("${jwt.expiration-time-minutes}") long expirationTime,
+                      ObjectMapper mapper) {
+        this.secret = secret;
+        this.expirationTime = expirationTime;
+        this.mapper = mapper;
+    }
 
     /**
      * Checks if a JWT token has expired.

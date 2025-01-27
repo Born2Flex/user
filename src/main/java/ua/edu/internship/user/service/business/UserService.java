@@ -88,8 +88,8 @@ public class UserService {
         log.info("Attempting to update user with ID: {}", id);
         checkForDuplicateEmail(updateDto.getEmail());
         UserEntity userEntity = getUserByIdOrElseThrow(id);
-        mapper.updateEntity(updateDto, userEntity);
-        UserDto updatedUser = mapper.toDto(userEntity);
+        UserEntity updatedEntity = mapper.updateEntity(userEntity, updateDto);
+        UserDto updatedUser = mapper.toDto(updatedEntity);
         log.info("User with id: {} updated successfully", updatedUser.getId());
         return updatedUser;
     }
@@ -105,9 +105,9 @@ public class UserService {
     public UserDto updateUserPassword(Long id, PasswordUpdateDto passwordDto) {
         log.info("Attempting to update password of user with id: {}", id);
         UserEntity userEntity = getUserByIdOrElseThrow(id);
-        mapper.updatePassword(passwordDto.getPassword(), userEntity);
+        UserEntity updatedEntity = mapper.updatePassword(userEntity, passwordDto.getPassword(), passwordEncoder);
         log.info("Password for user with id: {} updated successfully", id);
-        return mapper.toDto(userEntity);
+        return mapper.toDto(updatedEntity);
     }
 
     /**
