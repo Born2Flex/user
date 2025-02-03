@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import ua.edu.internship.user.service.dto.user.PasswordUpdateDto;
 import ua.edu.internship.user.service.dto.user.UserDto;
 import ua.edu.internship.user.service.dto.user.UserRegistrationDto;
@@ -98,5 +96,13 @@ public class UserController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         service.deleteUser(id);
+    }
+
+    @GetMapping("/exists/{id}")
+    @Operation(summary = "Check if a user exists by id")
+    @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = Boolean.class),
+            mediaType = "application/json")})
+    public boolean userExists(@PathVariable Long id) {
+        return service.userExists(id);
     }
 }

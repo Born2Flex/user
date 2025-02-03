@@ -1,11 +1,13 @@
 package ua.edu.internship.user.web.handler;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,10 +39,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleLogicException(BaseException exception) {
         log.error(exception.getMessage(), exception);
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(exception.getCode())
-                .message(exception.getMessage())
-                .build();
+        ErrorResponse errorResponse = buildErrorResponse(exception.getCode(), exception.getMessage());
         return new ResponseEntity<>(errorResponse, exception.getCode());
     }
 
@@ -49,9 +48,30 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ErrorResponse handleGenericException(Exception exception) {
         log.error("An unexpected error occurred: {}", exception.getMessage(), exception);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public ErrorResponse handleAuthenticationException(AuthenticationException exception) {
+        log.warn("Authentication failed: {}", exception.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException exception) {
+        log.warn("Access denied: {}", exception.getMessage());
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Access Denied");
+    }
+
+    private ErrorResponse buildErrorResponse(HttpStatus status, String message) {
         return ErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .message("Internal Server Error")
+                .timestamp(LocalDateTime.now())
+                .status(status)
+                .message(message)
                 .build();
     }
 }

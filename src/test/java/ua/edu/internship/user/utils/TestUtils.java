@@ -24,6 +24,15 @@ public final class TestUtils {
         return dto;
     }
 
+    public static UserUpdateDto getUpdateDto(String firstName, String lastName, String email, Role role) {
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setEmail(email);
+        dto.setRole(role);
+        return dto;
+    }
+
     public static UserDto getUserDto(Long id, String firstName, String lastName, String email, Role role) {
         UserDto dto = new UserDto();
         dto.setId(id);
