@@ -204,4 +204,12 @@ public class UserService {
     private void throwEmailDuplicateException(UserEntity user) {
         throw new EmailDuplicateException();
     }
+
+    public List<UserDto> getAllUsersByEmail(String email) {
+        List<UserDto> users = userRepository.findAllByEmailContainsIgnoreCase(email).stream()
+                .map(mapper::toDto)
+                .toList();
+        log.info("Retrieved {} users from the database by email: {}", users.size(), email);
+        return users;
+    }
 }

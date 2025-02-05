@@ -80,6 +80,11 @@ public class UserController {
         return service.getUserById(id);
     }
 
+    @GetMapping("/suggestions")
+    public List<UserDto> getUserSuggestions(@RequestParam(name = "email") String email) {
+        return service.getAllUsersByEmail(email);
+    }
+
     @GetMapping("/by-email")
     @Operation(summary = "Get information about user by email")
     @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = UserDto.class),
