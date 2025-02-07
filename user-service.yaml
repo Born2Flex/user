@@ -20,7 +20,12 @@ spec:
           image: born2flex/user-service:1.0
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: debug-port
+              containerPort: 5005
+              protocol: TCP
           env:
             - name: DATASOURCE_URL
               value: jdbc:postgresql://user-db-service:5432/user_db
@@ -34,4 +39,6 @@ spec:
               value: admin
             - name: ACTIVEMQ_PASSWORD
               value: password
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xdebug -agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n"
       restartPolicy: Always
