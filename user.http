@@ -1,0 +1,64 @@
+### Register a new user
+POST {{host}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "user@gmail.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "CANDIDATE",
+  "password": "a1@Abn!j16kl"
+}
+
+### Authorize and get JWT token
+POST {{host}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "user@gmail.com",
+  "password": "a1@Abn!j16kl"
+}
+
+### Get all users from the database
+GET {{host}}/users HTTP/1.1
+Authorization: {{token}}
+
+### User ID
+@id =14
+
+### Get a user by ID
+GET {{host}}/users/{{id}} HTTP/1.1
+Authorization: {{token}}
+
+### Check wether user exists by ID
+GET {{host}}/users/exists/{{id}} HTTP/1.1
+Authorization: {{token}}
+
+### Get a user by email
+GET {{host}}/users/by-email?email=user@gmail.com HTTP/1.1
+Authorization: {{token}}
+
+### Delete a user by ID
+DELETE {{host}}/users/{{id}} HTTP/1.1
+Authorization: {{token}}
+
+### Update user password
+PATCH {{host}}/users/{{id}} HTTP/1.1
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "password": "Qwe14556rty#?!amdkaskcd752123"
+}
+
+### Update user data
+PUT {{host}}/users/{{id}} HTTP/1.1
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "email": "john_doe123@gmail.com",
+  "firstName": "Bob",
+  "lastName": "Martin",
+  "role": "CANDIDATE"
+}
