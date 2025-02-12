@@ -9,7 +9,7 @@ User Service uses Postgres. You can configure the database connection by specify
 
 Also, User Service uses ActiveMQ for messaging. You can configure the queue connection by specifying your `spring.activemq.broker-url` in `application.yaml`.
 
-### Docker 
+### Docker
 
 If you have Docker installed, you can use the provided `docker-compose.yml` file to start required containers.
 
