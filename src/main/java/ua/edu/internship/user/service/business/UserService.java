@@ -81,17 +81,24 @@ public class UserService {
      * @param id ID of the user to update.
      * @param updateDto {@link UserUpdateDto} containing updated user data.
      * @return {@link UserDto} updated user.
-     * @throws NoSuchEntityException if the user with specified ID does not exist.
+     * @throws NoSuchEntityException   if the user with specified ID does not exist.
      * @throws EmailDuplicateException if user with such email already exists.
      */
     public UserDto updateUser(Long id, UserUpdateDto updateDto) {
         log.info("Attempting to update user with ID: {}", id);
-        checkForDuplicateEmail(updateDto.getEmail());
         UserEntity userEntity = getUserByIdOrElseThrow(id);
+        checkForDuplicateEmailToUpdate(updateDto, userEntity);
         UserEntity updatedEntity = mapper.updateEntity(userEntity, updateDto);
+        userRepository.save(updatedEntity);
         UserDto updatedUser = mapper.toDto(updatedEntity);
         log.info("User with id: {} updated successfully", updatedUser.getId());
         return updatedUser;
+    }
+
+    private void checkForDuplicateEmailToUpdate(UserUpdateDto updateDto, UserEntity userEntity) {
+        if (!userEntity.getEmail().equals(updateDto.getEmail())) {
+            checkForDuplicateEmail(updateDto.getEmail());
+        }
     }
 
     /**
@@ -106,6 +113,7 @@ public class UserService {
         log.info("Attempting to update password of user with id: {}", id);
         UserEntity userEntity = getUserByIdOrElseThrow(id);
         UserEntity updatedEntity = mapper.updatePassword(userEntity, passwordDto.getPassword(), passwordEncoder);
+        userRepository.save(updatedEntity);
         log.info("Password for user with id: {} updated successfully", id);
         return mapper.toDto(updatedEntity);
     }
@@ -195,5 +203,13 @@ public class UserService {
 
     private void throwEmailDuplicateException(UserEntity user) {
         throw new EmailDuplicateException();
+    }
+
+    public List<UserDto> getAllUsersByEmail(String email) {
+        List<UserDto> users = userRepository.findAllByEmailContainsIgnoreCase(email).stream()
+                .map(mapper::toDto)
+                .toList();
+        log.info("Retrieved {} users from the database by email: {}", users.size(), email);
+        return users;
     }
 }
