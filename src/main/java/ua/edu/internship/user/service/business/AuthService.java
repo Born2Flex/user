@@ -13,6 +13,16 @@ import ua.edu.internship.user.service.dto.auth.TokenDto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for user authentication.
+ *
+ * @author Danylo Shlapak
+ * @version 1.1
+ * @since 1.1
+ * @see PasswordEncoder
+ * @see JwtService
+ * @see UserRepository
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -20,10 +30,31 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public TokenDto authenticate(LoginDto dto) {
-        UserEntity user = userRepo.findByEmail(dto.getEmail())
+    /**
+     * Authenticates a user based on their login credentials and generates a JWT token.
+     * <p>
+     * This method validates the provided email and password, retrieves the user's role and permissions,
+     * and issues a secure JWT token to facilitate authenticated access to the system.
+     * <p>
+     * Example:
+     * <pre>
+     * {@code
+     * LoginDto loginDto = new LoginDto("email@example.com", "password");
+     * TokenDto token = authService.authenticate(loginDto);
+     * }
+     * </pre>
+     * Example JWT Token:
+     * <pre>
+     * {@code eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c}
+     * </pre>
+     * @param loginDto {@link LoginDto} containing the user's email and password.
+     * @return {@link TokenDto} with the generated JWT token.
+     * @throws BadCredentialsException if the provided credentials are invalid.
+     */
+    public TokenDto authenticate(LoginDto loginDto) {
+        UserEntity user = userRepo.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid email or password");
         }
         Set<String> permissions = user.getRole().getPermissions()

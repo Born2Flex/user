@@ -2,18 +2,16 @@ package ua.edu.internship.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import ua.edu.internship.user.config.security.TokenData;
 import ua.edu.internship.user.service.business.JwtService;
+import ua.edu.internship.user.service.utils.exceptions.InvalidTokenException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,20 +19,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static ua.edu.internship.user.service.business.JwtService.TOKEN_DATA_TYPE_REF;
 
 @ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
-    @Mock
     private ObjectMapper mapper;
-    @InjectMocks
     private JwtService jwtService;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(jwtService, "secret", "99A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75328955");
-        ReflectionTestUtils.setField(jwtService, "expirationTime", 10L);
+        mapper = mock(ObjectMapper.class);
+        String secret = "99A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75328955";
+        long expirationTime = 10L;
+        jwtService = new JwtService(secret, expirationTime, mapper);
     }
 
     @Test
@@ -95,6 +94,6 @@ class JwtServiceTest {
 
         // when
         // then
-        assertThrows(JwtException.class, () -> jwtService.isExpired(invalidToken));
+        assertThrows(InvalidTokenException.class, () -> jwtService.isExpired(invalidToken));
     }
 }

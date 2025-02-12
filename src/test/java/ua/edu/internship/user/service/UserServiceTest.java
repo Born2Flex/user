@@ -148,6 +148,7 @@ class UserServiceTest {
         UserUpdateDto userUpdateDto = getUserUpdateDto("email@gmail.com");
         when(userRepository.findByEmail("email@gmail.com")).thenReturn(Optional.empty());
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        when(mapper.updateEntity(userEntity, userUpdateDto)).thenReturn(userEntity);
         when(mapper.toDto(userEntity)).thenReturn(userDto);
 
         // when
@@ -157,6 +158,8 @@ class UserServiceTest {
         assertNotNull(result);
         matchUserFields(result, userDto);
         verify(userRepository).findById(1L);
+        verify(mapper).updateEntity(userEntity, userUpdateDto);
+        verify(mapper).toDto(userEntity);
     }
 
     @Test
@@ -166,6 +169,7 @@ class UserServiceTest {
         PasswordUpdateDto passwordUpdateDto = new PasswordUpdateDto();
         passwordUpdateDto.setPassword("password");
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        when(mapper.updatePassword(userEntity, "password", passwordEncoder)).thenReturn(userEntity);
         when(mapper.toDto(userEntity)).thenReturn(userDto);
 
         // when
@@ -175,6 +179,8 @@ class UserServiceTest {
         assertNotNull(result);
         matchUserFields(result, userDto);
         verify(userRepository).findById(1L);
+        verify(mapper).updatePassword(userEntity, "password", passwordEncoder);
+        verify(mapper).toDto(userEntity);
     }
 
     @Test

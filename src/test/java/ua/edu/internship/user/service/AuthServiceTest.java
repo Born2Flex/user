@@ -18,7 +18,6 @@ import ua.edu.internship.user.service.business.AuthService;
 import ua.edu.internship.user.service.business.JwtService;
 import ua.edu.internship.user.service.dto.auth.LoginDto;
 import ua.edu.internship.user.service.dto.auth.TokenDto;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,7 +99,7 @@ class AuthServiceTest {
 
         // when
         // then
-        assertThrows(NoSuchElementException.class, () -> authService.authenticate(loginDto));
+        assertThrows(BadCredentialsException.class, () -> authService.authenticate(loginDto));
         verify(userRepo).findByEmail("email@gmail.com");
     }
 }
