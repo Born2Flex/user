@@ -9,12 +9,12 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region = "eu-central-1"
+  region  = "eu-central-1"
 }
 
 resource "aws_vpc" "terra_vpc" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -23,8 +23,8 @@ resource "aws_vpc" "terra_vpc" {
 }
 
 resource "aws_subnet" "public_subnet" {
-  vpc_id = aws_vpc.terra_vpc.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id               = aws_vpc.terra_vpc.id
+  cidr_block           = "10.0.2.0/24"
   availability_zone_id = "euc1-az2"
 
   tags = {
@@ -33,8 +33,8 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_subnet" "public_subnet_2" {
-  vpc_id = aws_vpc.terra_vpc.id
-  cidr_block = "10.0.3.0/24"
+  vpc_id               = aws_vpc.terra_vpc.id
+  cidr_block           = "10.0.3.0/24"
   availability_zone_id = "euc1-az3"
 
   tags = {
@@ -65,16 +65,16 @@ resource "aws_route_table" "public_subnet_route_table" {
 
 resource "aws_route_table_association" "route_table_association" {
   route_table_id = aws_route_table.public_subnet_route_table.id
-  subnet_id = aws_subnet.public_subnet.id
+  subnet_id      = aws_subnet.public_subnet.id
 }
 
 resource "aws_route_table_association" "route_table_association_2" {
   route_table_id = aws_route_table.public_subnet_route_table.id
-  subnet_id = aws_subnet.public_subnet_2.id
+  subnet_id      = aws_subnet.public_subnet_2.id
 }
 
 resource "aws_security_group" "security_group" {
-  name = "AppSecGroup"
+  name   = "AppSecGroup"
   vpc_id = aws_vpc.terra_vpc.id
 }
 
@@ -125,14 +125,14 @@ resource "aws_security_group_rule" "allow_all" {
 
 resource "aws_instance" "application_instance" {
 
-  ami = "ami-0084a47cc718c111a"
-  instance_type = var.ec2_instance_type
-  subnet_id = aws_subnet.public_subnet.id
+  ami                         = "ami-0084a47cc718c111a"
+  instance_type               = var.ec2_instance_type
+  subnet_id                   = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.security_group.id]
   associate_public_ip_address = true
 
   tags = {
-    Name=var.instance_name
+    Name = var.instance_name
   }
 }
 
@@ -142,35 +142,35 @@ resource "aws_db_subnet_group" "database_subnet" {
 }
 
 resource "aws_db_instance" "postgres_instance" {
-  identifier = "terra-database"
-  allocated_storage = 5
-  storage_type = "standard"
-  engine = "postgres"
-  engine_version = "17.2"
-  instance_class = "db.t4g.micro"
-  username = "postgres"
-  password = "password"
-  skip_final_snapshot = true
-  multi_az =  false
-  publicly_accessible = true
+  identifier           = "terra-database"
+  allocated_storage    = 5
+  storage_type         = "standard"
+  engine               = "postgres"
+  engine_version       = "17.2"
+  instance_class       = "db.t4g.micro"
+  username             = "postgres"
+  password             = "password"
+  skip_final_snapshot  = true
+  multi_az             = false
+  publicly_accessible  = true
   db_subnet_group_name = aws_db_subnet_group.database_subnet.name
   vpc_security_group_ids = [aws_security_group.security_group.id]
 }
 
 resource "aws_mq_broker" "activemq_instance" {
-  broker_name        = "TerraBroker"
-  engine_type        = "ActiveMQ"
-  engine_version     = "5.18"
-  host_instance_type = "mq.t2.micro"
+  broker_name                = "TerraBroker"
+  engine_type                = "ActiveMQ"
+  engine_version             = "5.18"
+  host_instance_type         = "mq.t2.micro"
   security_groups = [aws_security_group.security_group.id]
   auto_minor_version_upgrade = true
-  publicly_accessible = true
+  publicly_accessible        = true
   subnet_ids = [aws_subnet.public_subnet.id]
-  apply_immediately = true
+  apply_immediately          = true
 
   user {
-    username = "user"
-    password = "Ml01smX1j0am"
+    username       = "user"
+    password       = "Ml01smX1j0am"
     console_access = true
   }
 }
