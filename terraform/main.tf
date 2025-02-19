@@ -37,35 +37,35 @@ resource "aws_db_subnet_group" "database_subnet" {
 }
 
 resource "aws_db_instance" "postgres_instance" {
-  identifier = "terra-database"
-  allocated_storage = 5
-  storage_type = "standard"
-  engine = "postgres"
-  engine_version = "17.2"
-  instance_class = "db.t4g.micro"
-  username = "postgres"
-  password = "password"
-  skip_final_snapshot = true
-  multi_az =  false
-  publicly_accessible = true
+  identifier           = "terra-database"
+  allocated_storage    = 5
+  storage_type         = "standard"
+  engine               = "postgres"
+  engine_version       = "17.2"
+  instance_class       = "db.t4g.micro"
+  username             = "postgres"
+  password             = "password"
+  skip_final_snapshot  = true
+  multi_az             = false
+  publicly_accessible  = true
   db_subnet_group_name = aws_db_subnet_group.database_subnet.name
   vpc_security_group_ids = [module.security_group.id]
 }
 
 resource "aws_mq_broker" "activemq_instance" {
-  broker_name        = "TerraBroker"
-  engine_type        = "ActiveMQ"
-  engine_version     = "5.18"
-  host_instance_type = "mq.t2.micro"
+  broker_name                = "TerraBroker"
+  engine_type                = "ActiveMQ"
+  engine_version             = "5.18"
+  host_instance_type         = "mq.t2.micro"
   security_groups = [module.security_group.id]
   auto_minor_version_upgrade = true
-  publicly_accessible = true
+  publicly_accessible        = true
   subnet_ids = [module.terra_vpc.subnet1_id]
-  apply_immediately = true
+  apply_immediately          = true
 
   user {
-    username = "user"
-    password = "Ml01smX1j0am"
+    username       = "user"
+    password       = "Ml01smX1j0am"
     console_access = true
   }
 }

@@ -1,4 +1,3 @@
-
 resource "aws_security_group" "security_group" {
   name   = "AppSecGroup"
   vpc_id = var.vpc_id
